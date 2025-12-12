@@ -1,0 +1,1236 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>塔羅牌 MVP - 單檔版</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: "Microsoft JhengHei", "Segoe UI", Tahoma, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            padding: 30px;
+        }
+        h1 {
+            color: #764ba2;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .disclaimer {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #856404;
+        }
+        .form-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .form-row {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        select, input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .inline-group {
+            display: flex;
+            gap: 15px;
+            align-items: flex-end;
+        }
+        .inline-group > div {
+            flex: 1;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-primary {
+            background: #764ba2;
+            color: white;
+            flex: 1;
+        }
+        .btn-primary:hover {
+            background: #5a3780;
+        }
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background: #545b62;
+        }
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        .btn-success:hover {
+            background: #218838;
+        }
+        .results {
+            margin-top: 30px;
+        }
+        .card-result {
+            background: white;
+            border: 2px solid #764ba2;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+        .card-result h3 {
+            color: #764ba2;
+            margin-bottom: 10px;
+        }
+        .card-name {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+            margin: 10px 0;
+        }
+        .reversed-badge {
+            display: inline-block;
+            background: #dc3545;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            margin-left: 8px;
+        }
+        .upright-badge {
+            display: inline-block;
+            background: #28a745;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            margin-left: 8px;
+        }
+        .keywords {
+            color: #667eea;
+            font-weight: bold;
+            margin: 8px 0;
+        }
+        .interpretation {
+            color: #555;
+            line-height: 1.6;
+            margin-top: 10px;
+        }
+        .overall-summary {
+            background: #e7f3ff;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .overall-summary h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        .json-output {
+            background: #f4f4f4;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        .json-output pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-size: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔮 塔羅牌占卜 MVP 🔮</h1>
+        
+        <div class="disclaimer">
+            ⚠️ <strong>提醒：</strong>本工具用於自我探索與反思，不構成醫療、法律或投資建議。
+        </div>
+
+        <div class="form-section">
+            <div class="form-row">
+                <label for="topic">主題 (Topic)</label>
+                <select id="topic">
+                    <option value="self">自我 (Self)</option>
+                    <option value="love">愛情 (Love)</option>
+                    <option value="career">事業 (Career)</option>
+                    <option value="study">學業 (Study)</option>
+                </select>
+            </div>
+
+            <div class="form-row">
+                <label for="spread">牌陣 (Spread)</label>
+                <select id="spread">
+                    <option value="single">單張：今日建議</option>
+                    <option value="three_past_present_future">三張：過去/現在/未來</option>
+                    <option value="three_situation_obstacle_advice">三張：現況/阻礙/建議</option>
+                </select>
+            </div>
+
+            <div class="form-row">
+                <label for="question">問題 (可選)</label>
+                <input type="text" id="question" placeholder="輸入你想問的問題...">
+            </div>
+
+            <div class="inline-group">
+                <div>
+                    <label for="includeReversed">是否使用逆位</label>
+                    <select id="includeReversed">
+                        <option value="no">否 (No)</option>
+                        <option value="yes">是 (Yes)</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="reversedRate">逆位機率</label>
+                    <select id="reversedRate">
+                        <option value="0.25">25%</option>
+                        <option value="0.33">33%</option>
+                        <option value="0.5">50%</option>
+                        <option value="0.66">66%</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <label for="seed">Seed (可選，用於重現結果)</label>
+                <input type="text" id="seed" placeholder="留空則自動產生...">
+            </div>
+
+            <div class="button-group">
+                <button class="btn-primary" onclick="drawCards()">🎴 抽牌 (Draw)</button>
+                <button class="btn-secondary" onclick="resetForm()">🔄 重置 (Reset)</button>
+                <button class="btn-success" onclick="copyJSON()">📋 複製 JSON</button>
+            </div>
+        </div>
+
+        <div id="resultsContainer" class="results hidden"></div>
+    </div>
+
+    <script>
+        // This file is intentionally large as it contains all tarot card data inline
+        // for offline functionality without external dependencies
+        
+        // ========== Data: Tarot Cards ==========
+        const CARDS = [
+            // Major Arcana - Complete set
+            {
+                id: "major_00",
+                name: "愚者 (The Fool)",
+                arcanaType: "MAJOR",
+                meanings: {
+                    upright: {
+                        keywords: ["新開始", "冒險", "自由", "純真"],
+                        general: "愚者代表新的開始和無限的可能性。這是一張充滿希望和冒險精神的牌，鼓勵你勇敢地踏出第一步。",
+                        topic: {
+                            love: "在愛情中，愚者象徵著一段新關係的開始，或是以開放的心態面對感情。",
+                            career: "事業上可能會有新的機會出現，是時候嘗試新的方向或項目了。",
+                            study: "學習新事物的好時機，保持好奇心和開放的態度。",
+                            self: "這是自我探索的開始，勇敢地做自己，不要害怕未知。"
+                        }
+                    },
+                    reversed: {
+                        keywords: ["魯莽", "不負責任", "風險", "缺乏計劃"],
+                        general: "逆位的愚者提醒你在行動前要三思，避免因過於衝動而犯錯。",
+                        topic: {
+                            love: "感情上可能太過衝動，需要更謹慎地考慮關係的發展。",
+                            career: "事業決策需要更多計劃，避免盲目冒險。",
+                            study: "學習態度可能不夠專注，需要更有條理的規劃。",
+                            self: "可能過於逃避現實，需要更負責任的態度。"
+                        }
+                    }
+                }
+            },
+            {
+                id: "major_01",
+                name: "魔術師 (The Magician)",
+                arcanaType: "MAJOR",
+                meanings: {
+                    upright: {
+                        keywords: ["技能", "力量", "創造", "行動"],
+                        general: "魔術師代表擁有實現目標的所有資源和能力。這是展現才能和付諸行動的時刻。",
+                        topic: {
+                            love: "你有能力創造理想的感情關係，主動出擊吧。",
+                            career: "具備所需的技能和資源，是展現專業能力的好時機。",
+                            study: "學習效率高，能夠掌握新知識和技能。",
+                            self: "認識到自己的潛力，有信心實現目標。"
+                        }
+                    },
+                    reversed: {
+                        keywords: ["操縱", "欺騙", "濫用才能", "缺乏信心"],
+                        general: "逆位的魔術師警告可能在濫用才能，或是缺乏自信無法發揮實力。",
+                        topic: {
+                            love: "感情中可能有欺騙或操縱的行為。",
+                            career: "才能未能充分發揮，或可能遇到不誠實的人。",
+                            study: "學習方法可能不當，需要重新審視。",
+                            self: "缺乏自信，無法展現真正的自己。"
+                        }
+                    }
+                }
+            },
+            {
+                id: "major_02",
+                name: "女祭司 (The High Priestess)",
+                arcanaType: "MAJOR",
+                meanings: {
+                    upright: {
+                        keywords: ["直覺", "神秘", "智慧", "內在知識"],
+                        general: "女祭司鼓勵你傾聽內在的聲音，相信直覺。有些事情需要時間才能揭曉。",
+                        topic: {
+                            love: "感情需要更深層的理解，傾聽心靈的指引。",
+                            career: "依靠直覺做決定，注意潛藏的訊息。",
+                            study: "深入學習，探索知識的深層意義。",
+                            self: "與內在智慧連結，靜心反思。"
+                        }
+                    },
+                    reversed: {
+                        keywords: ["忽視直覺", "秘密", "缺乏理解", "表面"],
+                        general: "逆位的女祭司表示可能忽視了內在的聲音，或有隱藏的真相尚未揭露。",
+                        topic: {
+                            love: "感情中可能有秘密或誤解。",
+                            career: "忽視重要的訊息，需要更深入了解情況。",
+                            study: "學習只停留在表面，需要更深入探索。",
+                            self: "與內在自我失去連結。"
+                        }
+                    }
+                }
+            },
+            {
+                id: "major_03",
+                name: "皇后 (The Empress)",
+                arcanaType: "MAJOR",
+                meanings: {
+                    upright: {
+                        keywords: ["豐盛", "養育", "創造力", "自然"],
+                        general: "皇后象徵豐盛和創造力，代表事物的成長和繁榮。這是收穫的時期。",
+                        topic: {
+                            love: "充滿愛與關懷的關係，可能有新生命或新階段。",
+                            career: "事業蓬勃發展，創意項目獲得成功。",
+                            study: "學習成果豐碩，知識自然增長。",
+                            self: "自我照顧和滋養，與自然連結。"
+                        }
+                    },
+                    reversed: {
+                        keywords: ["依賴", "過度保護", "創意枯竭", "忽視自我"],
+                        general: "逆位的皇后可能表示過度依賴他人，或是創造力受阻。",
+                        topic: {
+                            love: "感情中可能過度依賴或窒息。",
+                            career: "創意停滯，或過於依賴他人。",
+                            study: "學習動力不足，需要重新激發興趣。",
+                            self: "忽視自我照顧，需要更多關愛自己。"
+                        }
+                    }
+                }
+            },
+            {
+                id: "major_04",
+                name: "皇帝 (The Emperor)",
+                arcanaType: "MAJOR",
+                meanings: {
+                    upright: {
+                        keywords: ["權威", "結構", "控制", "領導"],
+                        general: "皇帝代表穩定的結構和權威。這是建立秩序和展現領導力的時候。",
+                        topic: {
+                            love: "關係中需要穩定和承諾，建立明確的界限。",
+                            career: "展現領導能力，建立有效的系統和流程。",
+                            study: "需要有紀律的學習方法和明確的目標。",
+                            self: "建立自我規範，發揮領導潛能。"
+                        }
+                    },
+                    reversed: {
+                        keywords: ["專制", "僵化", "缺乏紀律", "控制過度"],
+                        general: "逆位的皇帝警告可能過於嚴厲或僵化，或是缺乏必要的紀律。",
+                        topic: {
+                            love: "關係中可能有控制或支配的問題。",
+                            career: "管理方式過於僵化，或缺乏領導力。",
+                            study: "學習方法太過死板，或缺乏自律。",
+                            self: "可能過於嚴苛或缺乏自我約束。"
+                        }
+                    }
+                }
+            },
+            {
+                id: "major_05",
+                name: "教皇 (The Hierophant)",
+                arcanaType: "MAJOR",
+                meanings: {
+                    upright: {
+                        keywords: ["傳統", "教育", "信仰", "指導"],
+                        general: "教皇代表傳統智慧和精神指引。這是學習和遵循既定規則的時期。",
+                        topic: {
+                            love: "傳統的關係模式，可能涉及婚姻或承諾。",
+                            career: "遵循行業規範，尋求導師的指導。",
+                            study: "傳統的學習方式，接受正式教育。",
+                            self: "探索精神信仰，尋求人生指引。"
+                        }
+                    },
+                    reversed: {
+                        keywords: ["反叛", "非傳統", "限制", "僵化思維"],
+                        general: "逆位的教皇表示可能需要打破傳統，或是過於墨守成規。",
+                        topic: {
+                            love: "非傳統的關係，或對傳統價值觀的挑戰。",
+                            career: "反對既定規則，尋求創新的方式。",
+                            study: "傳統教育方式不適合，需要另類學習。",
+                            self: "質疑傳統信仰，尋找自己的道路。"
+                        }
+                    }
+                }
+            },
+            {
+                id: "major_06",
+                name: "戀人 (The Lovers)",
+                arcanaType: "MAJOR",
+                meanings: {
+                    upright: {
+                        keywords: ["愛", "選擇", "和諧", "價值觀"],
+                        general: "戀人牌代表重要的選擇和關係。這是關於價值觀和心靈契合的時刻。",
+                        topic: {
+                            love: "深刻的愛情關係，心靈相通的伴侶。",
+                            career: "重要的職業選擇，與價值觀相符的工作。",
+                            study: "選擇符合興趣的學習方向。",
+                            self: "面臨重要抉擇，需要忠於自己的價值觀。"
+                        }
+                    },
+                    reversed: {
+                        keywords: ["不和諧", "錯誤選擇", "價值衝突", "失衡"],
+                        general: "逆位的戀人表示關係不和諧，或是做出與價值觀不符的選擇。",
+                        topic: {
+                            love: "關係中出現問題，價值觀不一致。",
+                            career: "職業選擇可能與真實期望不符。",
+                            study: "學習方向可能不適合自己。",
+                            self: "內在衝突，需要重新審視價值觀。"
+                        }
+                    }
+                }
+            },
+            {
+                id: "major_07",
+                name: "戰車 (The Chariot)",
+                arcanaType: "MAJOR",
+                meanings: {
+                    upright: {
+                        keywords: ["勝利", "決心", "控制", "前進"],
+                        general: "戰車象徵通過意志力和決心克服障礙。這是向前推進並取得勝利的時刻。",
+                        topic: {
+                            love: "積極追求感情，克服關係中的障礙。",
+                            career: "事業上取得進展，克服挑戰達成目標。",
+                            study: "學習上保持專注和動力，克服困難。",
+                            self: "展現意志力，控制生活方向。"
+                        }
+                    },
+                    reversed: {
+                        keywords: ["失控", "缺乏方向", "阻礙", "挫敗"],
+                        general: "逆位的戰車表示可能失去控制，或是遇到難以克服的阻礙。",
+                        topic: {
+                            love: "關係失控，或方向不明確。",
+                            career: "事業受阻，或缺乏清晰的目標。",
+                            study: "學習失去動力，難以專注。",
+                            self: "感到迷失，需要重新找回方向。"
+                        }
+                    }
+                }
+            },
+            {
+                id: "major_08",
+                name: "力量 (Strength)",
+                arcanaType: "MAJOR",
+                meanings: {
+                    upright: {
+                        keywords: ["勇氣", "耐心", "內在力量", "慈悲"],
+                        general: "力量牌代表內在的勇氣和溫柔的力量。通過耐心和慈悲克服挑戰。",
+                        topic: {
+                            love: "以溫柔和耐心維繫關係，展現真正的力量。",
+                            career: "以堅韌和耐心面對工作挑戰。",
+                            study: "保持毅力，溫和而堅定地學習。",
+                            self: "發現內在力量，以慈悲對待自己。"
+                        }
+                    },
+                    reversed: {
+                        keywords: ["軟弱", "自我懷疑", "缺乏信心", "濫用力量"],
+                        general: "逆位的力量表示可能缺乏自信，或是以錯誤的方式使用力量。",
+                        topic: {
+                            love: "關係中缺乏自信，或過於強勢。",
+                            career: "工作上自我懷疑，或以不當方式展現權力。",
+                            study: "學習缺乏信心，容易放棄。",
+                            self: "內在力量被削弱，需要重建自信。"
+                        }
+                    }
+                }
+            },
+            {
+                id: "major_09",
+                name: "隱士 (The Hermit)",
+                arcanaType: "MAJOR",
+                meanings: {
+                    upright: {
+                        keywords: ["內省", "尋求", "獨處", "智慧"],
+                        general: "隱士代表通過獨處和內省尋找真理。這是深度思考和精神探索的時期。",
+                        topic: {
+                            love: "需要獨處時間思考關係，或尋找內心的答案。",
+                            career: "退一步思考職業方向，尋求更深層的意義。",
+                            study: "深入研究，獨立學習和思考。",
+                            self: "進行自我反省，尋找內在智慧。"
+                        }
+                    },
+                    reversed: {
+                        keywords: ["孤立", "孤獨", "拒絕幫助", "迷失"],
+                        general: "逆位的隱士可能表示過度孤立，或是拒絕他人的智慧和幫助。",
+                        topic: {
+                            love: "感情中過於疏離，或逃避親密關係。",
+                            career: "工作上過於孤立，需要更多合作。",
+                            study: "學習過於封閉，應尋求指導。",
+                            self: "過度孤獨，失去與他人的連結。"
+                        }
+                    }
+                }
+            },
+            {
+                id: "major_10",
+                name: "命運之輪 (Wheel of Fortune)",
+                arcanaType: "MAJOR",
+                meanings: {
+                    upright: {
+                        keywords: ["變化", "命運", "機會", "循環"],
+                        general: "命運之輪代表生命的循環和不可預測的變化。好運即將到來。",
+                        topic: {
+                            love: "關係進入新階段，命運般的相遇。",
+                            career: "事業出現轉機，把握新機會。",
+                            study: "學習境遇改變，新的學習機會。",
+                            self: "生活出現重要轉折，接受變化。"
+                        }
+                    },
+                    reversed: {
+                        keywords: ["不幸", "阻力", "失控", "不穩定"],
+                        general: "逆位的命運之輪表示暫時的不順，或是抗拒必要的改變。",
+                        topic: {
+                            love: "關係面臨不穩定，需要適應變化。",
+                            career: "事業遇到挫折，或錯失機會。",
+                            study: "學習受阻，或面臨困難。",
+                            self: "抗拒改變，需要接受生命的流動。"
+                        }
+                    }
+                }
+            },
+            {
+                id: "major_11",
+                name: "正義 (Justice)",
+                arcanaType: "MAJOR",
+                meanings: {
+                    upright: {
+                        keywords: ["公平", "真相", "法律", "平衡"],
+                        general: "正義牌代表公平和真相。你的行為將得到相應的結果。",
+                        topic: {
+                            love: "關係中需要公平和誠實，業力的回報。",
+                            career: "工作上的公平對待，或法律事務的解決。",
+                            study: "學習成果反映你的努力，公正的評價。",
+                            self: "面對真相，為自己的選擇負責。"
+                        }
+                    },
+                    reversed: {
+                        keywords: ["不公", "謊言", "逃避責任", "失衡"],
+                        general: "逆位的正義表示不公平的情況，或是逃避應負的責任。",
+                        topic: {
+                            love: "關係中缺乏公平，或有欺騙。",
+                            career: "工作上遭遇不公，或逃避責任。",
+                            study: "評價不公，或未能誠實面對學習。",
+                            self: "逃避責任，需要面對真相。"
+                        }
+                    }
+                }
+            },
+            {
+                id: "major_12",
+                name: "倒吊人 (The Hanged Man)",
+                arcanaType: "MAJOR",
+                meanings: {
+                    upright: {
+                        keywords: ["暫停", "犧牲", "新視角", "放手"],
+                        general: "倒吊人代表通過放手和改變視角獲得新的理解。這是暫停和反思的時期。",
+                        topic: {
+                            love: "感情需要時間和犧牲，換個角度看關係。",
+                            career: "事業上暫時等待，或需要做出犧牲。",
+                            study: "改變學習方法，從不同角度理解。",
+                            self: "放下執著，獲得新的領悟。"
+                        }
+                    },
+                    reversed: {
+                        keywords: ["拖延", "抗拒", "無謂犧牲", "僵局"],
+                        general: "逆位的倒吊人表示過度拖延，或是不願意做出必要的改變。",
+                        topic: {
+                            love: "關係陷入僵局，不願做出改變。",
+                            career: "工作停滯不前，或做出無意義的犧牲。",
+                            study: "學習方法固執，不願嘗試新方式。",
+                            self: "抗拒改變，需要放下舊有模式。"
+                        }
+                    }
+                }
+            },
+            {
+                id: "major_13",
+                name: "死神 (Death)",
+                arcanaType: "MAJOR",
+                meanings: {
+                    upright: {
+                        keywords: ["轉變", "結束", "新生", "釋放"],
+                        general: "死神代表重大的轉變和結束。舊的必須結束，新的才能開始。",
+                        topic: {
+                            love: "關係轉變，可能結束或進入新階段。",
+                            career: "事業重大改變，舊工作結束新機會來臨。",
+                            study: "學習階段結束，迎接新的學習旅程。",
+                            self: "自我轉變，釋放過去迎接新生。"
+                        }
+                    },
+                    reversed: {
+                        keywords: ["抗拒改變", "停滯", "無法放手", "恐懼"],
+                        general: "逆位的死神表示抗拒必要的改變，或是害怕放手。",
+                        topic: {
+                            love: "無法放下過去的關係，阻礙新的開始。",
+                            career: "抗拒職業轉變，停留在舒適區。",
+                            study: "固守舊有知識，不願接受新觀念。",
+                            self: "恐懼改變，需要勇敢面對轉變。"
+                        }
+                    }
+                }
+            },
+            {
+                id: "major_14",
+                name: "節制 (Temperance)",
+                arcanaType: "MAJOR",
+                meanings: {
+                    upright: {
+                        keywords: ["平衡", "和諧", "耐心", "節制"],
+                        general: "節制牌代表平衡和和諧。通過耐心和適度找到中庸之道。",
+                        topic: {
+                            love: "關係和諧平衡，需要耐心和妥協。",
+                            career: "工作與生活平衡，以溫和方式處理事務。",
+                            study: "學習保持適度，不急不躁。",
+                            self: "身心靈平衡，追求內在和諧。"
+                        }
+                    },
+                    reversed: {
+                        keywords: ["失衡", "過度", "不耐", "衝突"],
+                        general: "逆位的節制表示失去平衡，或是過度沉溺於某事。",
+                        topic: {
+                            love: "關係失衡，缺乏和諧。",
+                            career: "工作過度，或處理事務過於極端。",
+                            study: "學習失去節奏，過度或不足。",
+                            self: "生活失衡，需要重新調整。"
+                        }
+                    }
+                }
+            },
+            {
+                id: "major_15",
+                name: "惡魔 (The Devil)",
+                arcanaType: "MAJOR",
+                meanings: {
+                    upright: {
+                        keywords: ["束縛", "誘惑", "物質", "執著"],
+                        general: "惡魔牌代表受到束縛或誘惑。需要意識到什麼在限制你的自由。",
+                        topic: {
+                            love: "關係中的不健康依賴或執著。",
+                            career: "工作中的束縛，或過於物質化。",
+                            study: "學習動機不純，或受到不良誘惑。",
+                            self: "被慾望或習慣束縛，需要解脫。"
+                        }
+                    },
+                    reversed: {
+                        keywords: ["解脫", "覺醒", "擺脫束縛", "自由"],
+                        general: "逆位的惡魔表示開始擺脫束縛，獲得自由和覺醒。",
+                        topic: {
+                            love: "從不健康的關係中解脫。",
+                            career: "擺脫工作中的限制，獲得自由。",
+                            study: "克服不良學習習慣，重獲動力。",
+                            self: "覺醒並解除自我限制。"
+                        }
+                    }
+                }
+            },
+            {
+                id: "major_16",
+                name: "塔 (The Tower)",
+                arcanaType: "MAJOR",
+                meanings: {
+                    upright: {
+                        keywords: ["突變", "破壞", "啟示", "混亂"],
+                        general: "塔代表突如其來的改變和舊結構的崩塌。雖然痛苦，但帶來必要的覺醒。",
+                        topic: {
+                            love: "關係突然改變或結束，帶來痛苦但必要。",
+                            career: "工作環境突變，原有計劃被打亂。",
+                            study: "學習遭遇重大挫折，需要重新開始。",
+                            self: "信念崩塌，帶來痛苦但重要的覺醒。"
+                        }
+                    },
+                    reversed: {
+                        keywords: ["避免災難", "恐懼改變", "延遲崩潰", "內在動盪"],
+                        general: "逆位的塔表示可能避免了災難，或是內在的動盪尚未顯現。",
+                        topic: {
+                            love: "避免了關係破裂，但問題仍存在。",
+                            career: "暫時避免危機，但根本問題未解決。",
+                            study: "延遲面對學習問題，需要正視。",
+                            self: "壓抑內在動盪，需要釋放。"
+                        }
+                    }
+                }
+            },
+            {
+                id: "major_17",
+                name: "星星 (The Star)",
+                arcanaType: "MAJOR",
+                meanings: {
+                    upright: {
+                        keywords: ["希望", "靈感", "療癒", "平靜"],
+                        general: "星星帶來希望和療癒。這是重新獲得信心和靈感的時期。",
+                        topic: {
+                            love: "關係中重燃希望，療癒過去的傷痛。",
+                            career: "事業前景光明，找到新的靈感。",
+                            study: "學習充滿動力，獲得啟發。",
+                            self: "內心平靜，充滿希望和信心。"
+                        }
+                    },
+                    reversed: {
+                        keywords: ["失望", "缺乏信心", "絕望", "失去希望"],
+                        general: "逆位的星星表示暫時失去希望，或是缺乏信心和靈感。",
+                        topic: {
+                            love: "關係中感到失望，失去信心。",
+                            career: "事業前景黯淡，缺乏動力。",
+                            study: "學習失去興趣，感到迷茫。",
+                            self: "內心失落，需要重建信心。"
+                        }
+                    }
+                }
+            },
+            {
+                id: "major_18",
+                name: "月亮 (The Moon)",
+                arcanaType: "MAJOR",
+                meanings: {
+                    upright: {
+                        keywords: ["幻覺", "直覺", "潛意識", "不確定"],
+                        general: "月亮代表潛意識和不確定性。事情可能不如表面所見，需要信任直覺。",
+                        topic: {
+                            love: "關係中存在幻覺或誤解，需要澄清。",
+                            career: "工作情況不明朗，需要謹慎判斷。",
+                            study: "學習中感到困惑，需要更深入理解。",
+                            self: "面對內心陰影，探索潛意識。"
+                        }
+                    },
+                    reversed: {
+                        keywords: ["真相揭露", "清晰", "克服恐懼", "釋放焦慮"],
+                        general: "逆位的月亮表示困惑開始消散，真相逐漸清晰。",
+                        topic: {
+                            love: "關係中的誤解得到澄清。",
+                            career: "工作情況變得明朗，恐懼消除。",
+                            study: "學習困惑得到解答。",
+                            self: "克服內心恐懼，獲得清晰。"
+                        }
+                    }
+                }
+            },
+            {
+                id: "major_19",
+                name: "太陽 (The Sun)",
+                arcanaType: "MAJOR",
+                meanings: {
+                    upright: {
+                        keywords: ["成功", "喜悅", "活力", "正面"],
+                        general: "太陽象徵成功、喜悅和光明。一切都朝著積極的方向發展。",
+                        topic: {
+                            love: "關係充滿喜悅和溫暖，幸福美滿。",
+                            career: "事業成功，獲得認可和成就。",
+                            study: "學習順利，獲得優異成績。",
+                            self: "充滿活力和自信，享受生活。"
+                        }
+                    },
+                    reversed: {
+                        keywords: ["暫時挫折", "延遲", "缺乏熱情", "悲觀"],
+                        general: "逆位的太陽表示成功可能延遲，或是暫時失去熱情。",
+                        topic: {
+                            love: "關係中暫時的不愉快，但本質仍好。",
+                            career: "成功延遲，但最終會達成。",
+                            study: "學習遇到困難，但不會持續太久。",
+                            self: "暫時失去動力，需要重新找回熱情。"
+                        }
+                    }
+                }
+            },
+            {
+                id: "major_20",
+                name: "審判 (Judgement)",
+                arcanaType: "MAJOR",
+                meanings: {
+                    upright: {
+                        keywords: ["重生", "覺醒", "評估", "救贖"],
+                        general: "審判代表重要的覺醒和重生。這是評估過去並做出改變的時刻。",
+                        topic: {
+                            love: "關係獲得新生，或做出重要決定。",
+                            career: "事業轉折點，重新評估職業方向。",
+                            study: "學習態度轉變，重新認識學習價值。",
+                            self: "自我覺醒，重新評估人生。"
+                        }
+                    },
+                    reversed: {
+                        keywords: ["自我懷疑", "逃避判斷", "拖延決定", "內疚"],
+                        general: "逆位的審判表示逃避必要的判斷，或是過度自我批評。",
+                        topic: {
+                            love: "無法對關係做出決定，或過度內疚。",
+                            career: "逃避職業評估，延遲重要決定。",
+                            study: "不願面對學習成果，自我懷疑。",
+                            self: "過度自責，或逃避自我反省。"
+                        }
+                    }
+                }
+            },
+            {
+                id: "major_21",
+                name: "世界 (The World)",
+                arcanaType: "MAJOR",
+                meanings: {
+                    upright: {
+                        keywords: ["完成", "成就", "圓滿", "整合"],
+                        general: "世界代表完成和成就。一個重要的循環結束，準備迎接新的開始。",
+                        topic: {
+                            love: "關係達到圓滿狀態，或完成重要階段。",
+                            career: "事業目標達成，獲得重大成就。",
+                            study: "學習階段完成，獲得證書或認可。",
+                            self: "自我實現，達到完整和諧的狀態。"
+                        }
+                    },
+                    reversed: {
+                        keywords: ["未完成", "延遲", "缺乏閉合", "阻礙"],
+                        general: "逆位的世界表示尚未完成，或是達成目標受到阻礙。",
+                        topic: {
+                            love: "關係尚未達到理想狀態，仍有努力空間。",
+                            career: "目標尚未達成，或成功延遲。",
+                            study: "學習未完成，需要繼續努力。",
+                            self: "尚未達到自我實現，仍在成長中。"
+                        }
+                    }
+                }
+            },
+            // Minor Arcana - Wands (部分示例)
+            {
+                id: "wands_01",
+                name: "權杖一 (Ace of Wands)",
+                arcanaType: "MINOR",
+                suit: "wands",
+                rank: "ace",
+                meanings: {
+                    upright: {
+                        keywords: ["新計劃", "靈感", "動力", "創意"],
+                        general: "權杖一代表新的開始和創造性的靈感。這是啟動新計劃的好時機。",
+                        topic: {
+                            love: "新的愛情機會，或關係中注入新活力。",
+                            career: "新的工作項目或創業機會。",
+                            study: "學習新技能或開始新課程的動力。",
+                            self: "發現新的熱情和人生方向。"
+                        }
+                    },
+                    reversed: {
+                        keywords: ["延遲", "缺乏動力", "挫折", "錯失機會"],
+                        general: "逆位的權杖一表示計劃延遲或缺乏動力開始。",
+                        topic: {
+                            love: "愛情機會錯失，或缺乏追求的動力。",
+                            career: "項目延遲或創意受阻。",
+                            study: "學習動力不足，難以開始。",
+                            self: "失去方向感，需要重新找到熱情。"
+                        }
+                    }
+                }
+            },
+            {
+                id: "cups_01",
+                name: "聖杯一 (Ace of Cups)",
+                arcanaType: "MINOR",
+                suit: "cups",
+                rank: "ace",
+                meanings: {
+                    upright: {
+                        keywords: ["新感情", "愛", "直覺", "情感滿足"],
+                        general: "聖杯一代表情感的新開始和愛的流動。這是充滿愛與慈悲的時期。",
+                        topic: {
+                            love: "新戀情的開始，或現有關係更加深入。",
+                            career: "工作中找到情感滿足和意義。",
+                            study: "對學習充滿熱愛和興趣。",
+                            self: "情感豐富，與內在自我連結。"
+                        }
+                    },
+                    reversed: {
+                        keywords: ["情感封閉", "失望", "被壓抑", "空虛"],
+                        general: "逆位的聖杯一表示情感受阻或無法表達真實感受。",
+                        topic: {
+                            love: "情感無法流動，關係中感到空虛。",
+                            career: "工作缺乏情感投入和滿足感。",
+                            study: "對學習失去熱情。",
+                            self: "情感被壓抑，內心空虛。"
+                        }
+                    }
+                }
+            },
+            {
+                id: "swords_01",
+                name: "寶劍一 (Ace of Swords)",
+                arcanaType: "MINOR",
+                suit: "swords",
+                rank: "ace",
+                meanings: {
+                    upright: {
+                        keywords: ["清晰", "真相", "突破", "新思維"],
+                        general: "寶劍一代表思維清晰和突破。這是看清真相並做出明智決定的時刻。",
+                        topic: {
+                            love: "關係中獲得清晰認識，誠實溝通。",
+                            career: "工作中思路清晰，找到解決方案。",
+                            study: "學習豁然開朗，理解核心概念。",
+                            self: "思維清晰，認清真相。"
+                        }
+                    },
+                    reversed: {
+                        keywords: ["困惑", "混亂", "誤解", "暴力溝通"],
+                        general: "逆位的寶劍一表示思維混亂或溝通不當。",
+                        topic: {
+                            love: "關係中存在誤解，溝通不暢。",
+                            career: "工作中思路不清，難以決策。",
+                            study: "學習感到困惑，無法理解。",
+                            self: "思維混亂，需要冷靜思考。"
+                        }
+                    }
+                }
+            },
+            {
+                id: "pentacles_01",
+                name: "錢幣一 (Ace of Pentacles)",
+                arcanaType: "MINOR",
+                suit: "pentacles",
+                rank: "ace",
+                meanings: {
+                    upright: {
+                        keywords: ["新機會", "繁榮", "物質開始", "實現"],
+                        general: "錢幣一代表物質層面的新開始和機會。這是實現目標的好時機。",
+                        topic: {
+                            love: "關係變得更穩定，可能涉及承諾。",
+                            career: "新的工作機會或財務收穫。",
+                            study: "學習帶來實際成果和技能。",
+                            self: "物質生活改善，目標逐步實現。"
+                        }
+                    },
+                    reversed: {
+                        keywords: ["錯失機會", "財務問題", "缺乏規劃", "不穩定"],
+                        general: "逆位的錢幣一表示機會錯失或財務不穩定。",
+                        topic: {
+                            love: "關係缺乏穩定基礎。",
+                            career: "工作機會流失，或財務困難。",
+                            study: "學習缺乏實際應用，浪費資源。",
+                            self: "物質生活不穩定，需要更好規劃。"
+                        }
+                    }
+                }
+            }
+        ];
+
+        // ========== Data: Spreads ==========
+        const SPREADS = {
+            single: {
+                id: "single",
+                name: "單張：今日建議",
+                positions: [
+                    {
+                        index: 0,
+                        title: "今日建議",
+                        meaning: "今天你需要關注或思考的方向"
+                    }
+                ]
+            },
+            three_past_present_future: {
+                id: "three_past_present_future",
+                name: "三張：過去/現在/未來",
+                positions: [
+                    {
+                        index: 0,
+                        title: "過去",
+                        meaning: "影響當前情況的過去因素或經驗"
+                    },
+                    {
+                        index: 1,
+                        title: "現在",
+                        meaning: "當前的狀況和你所處的位置"
+                    },
+                    {
+                        index: 2,
+                        title: "未來",
+                        meaning: "如果維持現狀，可能的發展方向"
+                    }
+                ]
+            },
+            three_situation_obstacle_advice: {
+                id: "three_situation_obstacle_advice",
+                name: "三張：現況/阻礙/建議",
+                positions: [
+                    {
+                        index: 0,
+                        title: "現況",
+                        meaning: "當前情況的整體描述"
+                    },
+                    {
+                        index: 1,
+                        title: "阻礙",
+                        meaning: "阻礙你前進的因素或挑戰"
+                    },
+                    {
+                        index: 2,
+                        title: "建議",
+                        meaning: "如何克服阻礙並前進的指引"
+                    }
+                ]
+            }
+        };
+
+        // ========== Seeded Random Generator ==========
+        class SeededRandom {
+            constructor(seed) {
+                this.seed = seed % 2147483647;
+                if (this.seed <= 0) this.seed += 2147483646;
+            }
+
+            next() {
+                this.seed = (this.seed * 16807) % 2147483647;
+                return (this.seed - 1) / 2147483646;
+            }
+
+            shuffle(array) {
+                const arr = [...array];
+                for (let i = arr.length - 1; i > 0; i--) {
+                    const j = Math.floor(this.next() * (i + 1));
+                    [arr[i], arr[j]] = [arr[j], arr[i]];
+                }
+                return arr;
+            }
+        }
+
+        // ========== Global State ==========
+        let currentReadingResult = null;
+
+        // ========== Core Functions ==========
+        function generateSeed() {
+            return Math.floor(Math.random() * 2147483647);
+        }
+
+        function drawCards() {
+            const topic = document.getElementById('topic').value;
+            const spreadId = document.getElementById('spread').value;
+            const question = document.getElementById('question').value.trim();
+            const includeReversed = document.getElementById('includeReversed').value === 'yes';
+            const reversedRate = parseFloat(document.getElementById('reversedRate').value);
+            let seed = document.getElementById('seed').value.trim();
+
+            if (!seed) {
+                seed = generateSeed().toString();
+                document.getElementById('seed').value = seed;
+            }
+
+            const seedNum = parseInt(seed);
+            const rng = new SeededRandom(seedNum);
+            const spread = SPREADS[spreadId];
+
+            const shuffledCards = rng.shuffle(CARDS);
+            const drawnCards = shuffledCards.slice(0, spread.positions.length);
+
+            const cards = drawnCards.map((card, index) => {
+                const isReversed = includeReversed && rng.next() < reversedRate;
+                const orientation = isReversed ? 'reversed' : 'upright';
+                const meanings = card.meanings[orientation];
+                const topicText = meanings.topic && meanings.topic[topic] 
+                    ? meanings.topic[topic] 
+                    : meanings.general;
+
+                return {
+                    position: spread.positions[index],
+                    card: {
+                        id: card.id,
+                        name: card.name,
+                        arcanaType: card.arcanaType
+                    },
+                    orientation: orientation,
+                    keywords: meanings.keywords,
+                    interpretation: topicText
+                };
+            });
+
+            const majorCount = cards.filter(c => c.card.arcanaType === 'MAJOR').length;
+            const reversedCount = cards.filter(c => c.orientation === 'reversed').length;
+            const totalCount = cards.length;
+
+            let overallSummary = '';
+            if (majorCount === totalCount) {
+                overallSummary = '所有牌都是大牌，表示這個問題涉及重要的人生課題或命運性的影響。';
+            } else if (majorCount > totalCount / 2) {
+                overallSummary = '大牌較多，顯示此事具有深遠的影響，可能涉及重要的生命議題。';
+            } else if (majorCount === 0) {
+                overallSummary = '全是小牌，表示這是日常生活中的事務，較容易掌控和改變。';
+            } else {
+                overallSummary = '大小牌混合，顯示此事既有重要意義，也涉及日常實務層面。';
+            }
+
+            if (reversedCount > 0) {
+                overallSummary += ` 有 ${reversedCount} 張逆位牌，提醒你注意內在阻礙、延遲或需要調整的面向。`;
+            }
+
+            currentReadingResult = {
+                timestamp: new Date().toISOString(),
+                topic: topic,
+                spread: {
+                    id: spread.id,
+                    name: spread.name
+                },
+                question: question || null,
+                settings: {
+                    includeReversed: includeReversed,
+                    reversedRate: reversedRate,
+                    seed: seedNum
+                },
+                cards: cards,
+                summary: {
+                    overallInterpretation: overallSummary,
+                    majorArcanaCount: majorCount,
+                    reversedCount: reversedCount
+                }
+            };
+
+            displayResults(currentReadingResult);
+        }
+
+        function displayResults(result) {
+            const container = document.getElementById('resultsContainer');
+            container.classList.remove('hidden');
+
+            let html = '<h2>🎴 抽牌結果</h2>';
+
+            result.cards.forEach((cardResult, index) => {
+                const badge = cardResult.orientation === 'reversed' 
+                    ? '<span class="reversed-badge">逆位</span>' 
+                    : '<span class="upright-badge">正位</span>';
+                
+                html += `
+                    <div class="card-result">
+                        <h3>位置 ${index + 1}: ${cardResult.position.title}</h3>
+                        <p><em>${cardResult.position.meaning}</em></p>
+                        <div class="card-name">${cardResult.card.name} ${badge}</div>
+                        <div class="keywords">關鍵字：${cardResult.keywords.join('、')}</div>
+                        <div class="interpretation">${cardResult.interpretation}</div>
+                    </div>
+                `;
+            });
+
+            html += `
+                <div class="overall-summary">
+                    <h3>整體摘要</h3>
+                    <p>${result.summary.overallInterpretation}</p>
+                </div>
+            `;
+
+            html += `
+                <div class="json-output">
+                    <h3>完整結果 (JSON)</h3>
+                    <pre>${JSON.stringify(result, null, 2)}</pre>
+                </div>
+            `;
+
+            container.innerHTML = html;
+            container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function resetForm() {
+            document.getElementById('topic').value = 'self';
+            document.getElementById('spread').value = 'single';
+            document.getElementById('question').value = '';
+            document.getElementById('includeReversed').value = 'no';
+            document.getElementById('reversedRate').value = '0.33';
+            document.getElementById('seed').value = '';
+            document.getElementById('resultsContainer').classList.add('hidden');
+            currentReadingResult = null;
+        }
+
+        async function copyJSON() {
+            if (!currentReadingResult) {
+                alert('請先抽牌！');
+                return;
+            }
+
+            const jsonText = JSON.stringify(currentReadingResult, null, 2);
+
+            try {
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    await navigator.clipboard.writeText(jsonText);
+                    alert('✅ JSON 已複製到剪貼簿！');
+                } else {
+                    fallbackCopyToClipboard(jsonText);
+                }
+            } catch (err) {
+                fallbackCopyToClipboard(jsonText);
+            }
+        }
+
+        function fallbackCopyToClipboard(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            textarea.select();
+            
+            try {
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    alert('✅ JSON 已複製到剪貼簿！');
+                } else {
+                    alert('❌ 複製失敗，請手動複製。');
+                }
+            } catch (err) {
+                alert('❌ 複製失敗，請手動複製。');
+            }
+            
+            document.body.removeChild(textarea);
+        }
+    </script>
+</body>
+</html>
